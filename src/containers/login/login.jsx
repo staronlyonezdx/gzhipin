@@ -31,7 +31,7 @@ class Login extends Component {
     }
     return (
       <div>
-        <NavBar>用户注册</NavBar>
+        <NavBar>用户登陆</NavBar>
         <Logo/>
         <WingBlank>
           <List>
