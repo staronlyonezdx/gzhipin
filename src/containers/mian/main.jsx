@@ -59,7 +59,8 @@ class Main extends Component {
 
   render() {
     const path = this.props.location.pathname;
-    const user = this.props.user;
+    const {user, unReadCount} = this.props;
+    // console.log(unReadCount);
     const {navList} = this;
     //如果是根路径,通过判断去那个路径
 
@@ -101,13 +102,13 @@ class Main extends Component {
           <Route path='/chat/:userid' component={Chat}/>
           <Route component={NotFound}/>
         </Switch>
-        {currentNav ? <NavFooter navList={navList}/> : null}
+        {currentNav ? <NavFooter navList={navList} unReadCount={unReadCount}/> : null}
       </div>
     )
   }
 }
 
 export default connect(
-  state => ({user: state.user}),
+  state => ({user: state.user, unReadCount: state.chat.unReadCount}),
   {getUser}
 )(Main);

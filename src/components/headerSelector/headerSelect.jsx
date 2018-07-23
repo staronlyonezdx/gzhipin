@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 
 class HeaderSelect extends Component {
   static propTypes = {
-    setHeader: PropTypes.func.isRequired
+    setHeader: PropTypes.func.isRequired,
   };
   state = {
     icon: null

@@ -10,16 +10,18 @@ import {
   RECEIVE_USER_LIST,
   RECEIVE_CHAT_MSG,
   RECEIVE_CHAT_MSGS,
+  CHAT_MSG_READ
 } from "./actions-type";
-import {reqRegister, reqLogin, reqUpdateUser, reqUser, reqUsers, reqChatMsgList} from "../api";
+import {reqRegister, reqLogin, reqUpdateUser, reqUser, reqUsers, reqChatMsgList, reqReadChatMsg} from "../api";
 
 const authSuccess = user => ({type: AUTH_SUCCESS, data: user});
 const errorMsg = msg => ({type: ERROR_MSG, data: msg});
 const receiveUser = user => ({type: RECEIVE_USER, data: user});
 export const resetUser = msg => ({type: RESET_USER, data: msg});
 export const receiveUserList = userList => ({type: RECEIVE_USER_LIST, data: userList});
-const receiveChatMsg = (chatMsg) => ({type: RECEIVE_CHAT_MSG, data: chatMsg});
-const receiveChatMsgs = ({users, chatMsgs}) => ({type: RECEIVE_CHAT_MSGS, data: {users, chatMsgs}});
+const receiveChatMsg = (chatMsg, meId) => ({type: RECEIVE_CHAT_MSG, data: {chatMsg, meId}});
+const receiveChatMsgs = ({users, chatMsgs, meId}) => ({type: RECEIVE_CHAT_MSGS, data: {users, chatMsgs, meId}});
+const chatMsgRead = ({count, from, to}) => ({type: CHAT_MSG_READ, data: {count, from, to}});
 
 
 /*
@@ -130,7 +132,7 @@ function initIo(dispatch, meId) {
     socket.on('receiveMsg', (chatMsg) => {
       // console.log(chatMsg);
       if (meId === chatMsg.from || meId === chatMsg.to)
-        dispatch(receiveChatMsg(chatMsg));
+        dispatch(receiveChatMsg(chatMsg, meId));
     });
   }
 }
@@ -153,6 +155,19 @@ async function getChatMsgs(dispatch, meId) {
   if (result.code === 0) {
     // console.log(result.data);
     const {users, chatMsgs} = result.data;
-    dispatch(receiveChatMsgs({users, chatMsgs}));
+    dispatch(receiveChatMsgs({users, chatMsgs, meId}));
+  }
+}
+
+//异步更新未读消息数量
+export function readChatMsg(from, to) {
+  return async dispatch => {
+    const response = await reqReadChatMsg(from);
+    const result = response.data;
+    if (result.code === 0) {
+      const count = result.data;
+      // console.log(count);
+      dispatch(chatMsgRead({count, from, to}));
+    }
   }
 }

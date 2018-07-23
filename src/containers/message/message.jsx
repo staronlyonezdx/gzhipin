@@ -58,6 +58,7 @@ class Message extends Component {
             }
             const targetUser = users[targetId];
             const {username, header} = targetUser;
+            // console.log(msg.unReadCount);
             return (
               <Item
                 key={msg._id}
@@ -65,6 +66,7 @@ class Message extends Component {
                 style={{marginTop: 50, marginBottom: 50}}
                 thumb={require(`../../assets/imgs/${header}.png`)}
                 arrow='horizontal'
+                onClick={() => this.props.history.push(`/chat/${targetId}`)}
               >
                 {msg.content}
                 <Brief>{username}</Brief>
