@@ -10,6 +10,7 @@ import Laoban from "../laoban/laoban";
 import Dashen from "../dashen/dashen";
 import Message from '../message/message';
 import Personal from '../personal/personal';
+import Chat from '../chat/chat';
 import NavFooter from "../../components/navfooter/navfooter";
 import NotFound from "../../components/not-found/not-fond";
 import {getUser} from '../../redux/actions';
@@ -59,22 +60,37 @@ class Main extends Component {
   render() {
     const path = this.props.location.pathname;
     const user = this.props.user;
-    if (path === '/') {
-      return <Redirect to={getRedirect(user.type, user.header)}/>
-    }
-    const currentNav = this.navList.find(function (nav, index) {
+    const {navList} = this;
+    //如果是根路径,通过判断去那个路径
+
+    const currentNav = navList.find(function (nav, index) {
       return nav.path === path;
     });
     const userid = Cookies.get('userid');
+    //判断有没有userid的cookie,如果没有,就跳转到登陆界面
     if (!userid) {
       return <Redirect to='/login'/>
     }
+    //如果有userid的cookie,判断是否登陆,如果没有登陆,去服务器请求数据
     if (!user._id) {
       return null;
     }
+    if (path === '/') {
+      return <Redirect to={getRedirect(user.type, user.header)}/>
+    }
+    //根据用户的type类型,判断最下面导航该显示哪个
+    if (user.type === 'dashen') {
+      navList[0].hide = true;
+      navList[1].hide = false;
+    } else {
+      navList[1].hide = true;
+      navList[0].hide = false;
+    }
+
+
     return (
       <div>
-        {currentNav ? <NavBar>{currentNav.title}</NavBar> : null}
+        {currentNav ? <NavBar className='fixed-top'>{currentNav.title}</NavBar> : null}
         <Switch>
           <Route path='/laobaninfo' component={LaobanInfo}/>
           <Route path='/dasheninfo' component={DashenInfo}/>
@@ -82,9 +98,10 @@ class Main extends Component {
           <Route path='/dashen' component={Dashen}/>
           <Route path='/message' component={Message}/>
           <Route path='/personal' component={Personal}/>
+          <Route path='/chat/:userid' component={Chat}/>
           <Route component={NotFound}/>
         </Switch>
-        {currentNav ? <NavFooter/> : null}
+        {currentNav ? <NavFooter navList={navList}/> : null}
       </div>
     )
   }
